@@ -46,11 +46,63 @@ class ModelTrainer:
                 "Lasso":Lasso(),
                 "AdaBoost":AdaBoostRegressor(),
                 "XG Boost":XGBRegressor(),
-                "Cat Boost":CatBoostRegressor(),
                 "Gradient Boost":GradientBoostingRegressor(),
             }
-
-            model_scores:dict = evaluate_model(X_train,y_train,X_test,y_test,models)
+            params = {
+                "Decision Tree": {
+                    'criterion': ['squared_error', 'friedman_mse', 'absolute_error', 'poisson'], 
+                    'splitter': ['best', 'random'],
+                },
+                "Random Forest": {
+                    'n_estimators' : [8,16,32,64,128,256], 
+                    'criterion': ['squared_error', 'absolute_error', 'friedman_mse', 'poisson'],
+                },
+                "AdaBoost": {
+                    'n_estimators': [8,16,32,64,128,256],
+                    'learning_rate': [0.01,0.05,0.1,0.5],
+                    'loss': ['linear', 'square', 'exponential'], 
+                    'random_state': [42],
+                },
+                "XG Boost": {
+                    'depth':[6,8,10],
+                    'learning_rate':[0.01,0.05,0.1],
+                    'iterations':[30,50,100]
+                },
+                "Gradient Boost": {
+                    'loss': ['squared_error', 'absolute_error', 'huber', 'quantile'],
+                    'learning_rate': [0.01,0.05,0.1],
+                    'n_estimators': [8,16,32,64,128,256],
+                    'criterion': ['friedman_mse', 'squared_error'],
+                },
+                "Linear Regression": {
+                    'fit_intercept': [True, False],
+                    'positive': [True, False],
+                },
+                "Ridge": {
+                    'alpha': [0.1, 1.0, 10.0, 100.0],
+                    'fit_intercept': [True, False],
+                    'solver': ['auto', 'svd', 'cholesky', 'lsqr', 'sparse_cg'],
+                },
+                "Lasso": {
+                    'alpha': [0.001, 0.01, 0.1, 1.0, 10.0],
+                    'fit_intercept': [True, False],
+                    'selection': ['cyclic', 'random'],
+                },
+                "SVM": {
+                    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+                    'C': [0.1, 1, 10, 100],
+                    'gamma': ['scale', 'auto'],
+                    'degree': [2, 3, 4],
+                },
+                "KNN": {
+                    'n_neighbors': [3, 5, 7, 9],
+                    'weights': ['uniform', 'distance'],
+                    'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],
+                    'leaf_size': [10, 20, 30, 40],
+                    'p': [1, 2],  # Manhattan vs Euclidean
+                },
+            }
+            model_scores:dict = evaluate_model(X_train,y_train,X_test,y_test,models,params)
 
             best_model_score = max(sorted(model_scores.values()))
 
@@ -59,7 +111,7 @@ class ModelTrainer:
             ]
 
             best_model = models[best_model_name]
-
+            
             if best_model_score < 0.6:
                 raise CustomException("No best model found!")
             
