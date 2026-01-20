@@ -38,7 +38,7 @@ class DataTransformation:
             category_pipeline = Pipeline(
                 steps=[
                     ('imputer',SimpleImputer(strategy='most_frequent')),# Fills the missing values with mode
-                    ('One Hot',OneHotEncoder())
+                    ('One Hot',OneHotEncoder(handle_unknown='ignore'))
                 ]
             )
             logging.info(f"Categorical columns: {categorical_column}")
